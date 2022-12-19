@@ -27,10 +27,9 @@ keep in mind that you should have everything in config set before that.
 The following endpoints are available:
 
 - Create wallet: POST /wallet - No body 
-- Get wallets: GET /wallet
-- Get wallet: GET /wallet/:id:
-- Deposit ethers into the Smart contract: POST /deposit - Body params: senderId(integer), amountInEthers(string)
-- Get deposit receipt: GET /deposit/:txHash:
+- Get balance: GET /balance/:address
+- Deposit ethers into the Smart contract: POST /deposit - Body params: privateKey(string), amountInEthers(string)
+- Recieve ethers from the Smart contract: POST /pay - Body params: privateKey(string), amountInEthers(string)
 
 ### Usage example
 
@@ -45,11 +44,10 @@ content-type: application/json; charset=utf-8
 
 {
     "address": "0x7E039A00fFFD8d8C898e77e52351c799C99D3a2D",
-    "id": 1,
     "privateKey": "0x67bb00f89f7b50f9e2924e423d00889c627b9acdc20b738ce00ccdcf6e4b8da0"
 }
 
-$ http POST http://localhost:3000/wallet
+$ http POST http://localhost:3000/balance/0x7E039A00fFFD8d8C898e77e52351c799C99D3a2D
 HTTP/1.1 200 OK
 Connection: keep-alive
 Date: Sun, 08 Aug 2021 19:26:54 GMT
@@ -58,12 +56,10 @@ content-length: 145
 content-type: application/json; charset=utf-8
 
 {
-    "address": "0x6698F9b4c67AeDAcd728297F2bF9eC15993398a4",
-    "id": 2,
-    "privateKey": "0x7d7b4134704871ea90bc417a9fb21d8e643e076bd67f1253189e75181258c500"
+  0.0
 }
 
-$ http POST http://localhost:3000/deposit senderId=1 amountInEthers='0.01'          
+$ http POST http://localhost:3000/deposit privateKey="0x67bb00f89f7b50f9e2924e423d00889c627b9acdc20b738ce00ccdcf6e4b8da0" amountInEthers='0.01'          
 HTTP/1.1 200 OK
 Connection: keep-alive
 Date: Sun, 08 Aug 2021 19:27:38 GMT
@@ -96,7 +92,7 @@ content-type: application/json; charset=utf-8
     }
 }
 
-$ http GET http://localhost:3000/deposit/0x9f98447de34d3245ce1976956334336a6302befc4f204ac44a7cac0526caa82d
+$ http GET http://localhost:3000/pay privateKey="0x67bb00f89f7b50f9e2924e423d00889c627b9acdc20b738ce00ccdcf6e4b8da0" amountInEthers='0.01'  
 HTTP/1.1 200 OK
 Connection: keep-alive
 Date: Sun, 08 Aug 2021 19:28:00 GMT
@@ -105,11 +101,35 @@ content-length: 121
 content-type: application/json; charset=utf-8
 
 {
-    "amountSent": {
-        "hex": "0x2386f26fc10000",
-        "type": "BigNumber"
+    "type": 2,
+    "chainId": 5,
+    "nonce": 54,
+    "maxPriorityFeePerGas": {
+        "type": "BigNumber",
+        "hex": "0x59682f00"
     },
-    "senderAddress": "0x7E039A00fFFD8d8C898e77e52351c799C99D3a2D"
+    "maxFeePerGas": {
+        "type": "BigNumber",
+        "hex": "0x59682fb8"
+    },
+    "gasPrice": null,
+    "gasLimit": {
+        "type": "BigNumber",
+        "hex": "0xf347"
+    },
+    "to": "0x778A30259c20A7c106e85989ec9c04e1CEdC3Cb6",
+    "value": {
+        "type": "BigNumber",
+        "hex": "0x00"
+    },
+    "data": "0x935f4c18000000000000000000000000778a30259c20a7c106e85989ec9c04e1cedc3cb6000000000000000000000000000000000000000000000000002386f26fc10000",
+    "accessList": [],
+    "hash": "0x6e9c0d66edc5064879d7f212a4e546c9cfe9706219322ee68903c11bb817e3d7",
+    "v": 0,
+    "r": "0x4785a37feb3f53004f1f550cdcb37ac9338cf38a1ef74c10d919a77933a89a8c",
+    "s": "0x06c6494a0336a1dbca4f4ca4d3a22450ea042b2237008644d808f1e4d4d528a2",
+    "from": "0x6297034942AC8F86F19f7c3a64532F69b6b25c1a",
+    "confirmations": 0
 }
 
 ```
